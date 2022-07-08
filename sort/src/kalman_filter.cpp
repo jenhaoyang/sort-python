@@ -1,3 +1,5 @@
+#define _USE_MATH_DEFINES
+#include <cmath> //M_PI 錯誤 https://stackoverflow.com/a/26065595
 #include "kalman_filter.h"
 
 
