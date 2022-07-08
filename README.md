@@ -6,6 +6,7 @@ Python module bindings for SORT algorithm (Simple, Online, and Realtime Tracking
 
 Before you can install the package, you need to install the following dependencies:
 
+## for Ubuntu user
 ```bash
 $ sudo apt install libopencv-dev
 $ sudo apt install libeigen3-dev
@@ -14,6 +15,15 @@ Make sure pip is upgraded to last version:
 ```bash
 $ pip install pip --upgrade
 ```
+
+# for Windows User (For build from source)
+(Install OpenCV)[https://docs.opencv.org/4.6.0/d3/d52/tutorial_windows_install.html]  
+(Install Eigen3)[https://gitlab.com/libeigen/eigen/-/blob/master/INSTALL#L19] wihtout the "make install" step
+Set environment variable for cmake to find packege
+* Eigen3_ROOT
+* OpenCV_ROOT
+
+
 
 Then you can install the package using:
 

@@ -1,7 +1,7 @@
 #pragma once
 
 #include <iostream>
-#include <eigen3/Eigen/Dense>
+#include <Eigen/Dense>
 
 // abstract class for Kalman filter
 // implementation could be KF/EKF/UKF...
