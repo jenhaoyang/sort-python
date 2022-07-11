@@ -130,3 +130,6 @@ dmypy.json
 
 _skbuild
 scripts.txt
+my_exp/
+cpp_sort_dev/.vs
+cpp_sort_dev/out
