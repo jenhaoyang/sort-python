@@ -18,14 +18,14 @@ public:
     float GetNIS() const;
 
     int coast_cycles_ = 0, hit_streak_ = 0;
+    int confidence = -1;
+    int obj_type = -1;
 
 private:
     Eigen::VectorXd ConvertBboxToObservation(const cv::Rect& bbox) const;
     cv::Rect ConvertStateToBbox(const Eigen::VectorXd &state) const;
 
     KalmanFilter kf_;
-    int confidence = -1;
-    int obj_type = -1;
 };
 
 cv::Rect convert_single_rect(const cv::Vec6i& detail_detections);

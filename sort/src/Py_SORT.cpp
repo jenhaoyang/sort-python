@@ -202,8 +202,8 @@ static PyObject *Py_SORT_run(Py_SORT *self, PyObject *args)
             ymin = *(int *)PyArray_GETPTR2(py_array, i, 1);
             width = *(int *)PyArray_GETPTR2(py_array, i, 2);
             height = *(int *)PyArray_GETPTR2(py_array, i, 3);
-            confidence = 90;
-            obj_type = 1;
+            confidence = *(int *)PyArray_GETPTR2(py_array, i, 4);
+            obj_type = *(int *)PyArray_GETPTR2(py_array, i, 5);
             detail_bbxs.push_back(cv::Vec6i(xmin, ymin, width, height, confidence, obj_type));
         }
         break;
@@ -214,8 +214,8 @@ static PyObject *Py_SORT_run(Py_SORT *self, PyObject *args)
             height = *(int *)PyArray_GETPTR2(py_array, i, 3);
             xmin = *(int *)PyArray_GETPTR2(py_array, i, 0) - width / 2;
             ymin = *(int *)PyArray_GETPTR2(py_array, i, 1) - height / 2;
-            confidence = 90;
-            obj_type = 1;
+            confidence = *(int *)PyArray_GETPTR2(py_array, i, 4);
+            obj_type = *(int *)PyArray_GETPTR2(py_array, i, 5);
             detail_bbxs.push_back(cv::Vec6i(xmin, ymin, width, height, confidence, obj_type));
         }
         break;
@@ -226,8 +226,8 @@ static PyObject *Py_SORT_run(Py_SORT *self, PyObject *args)
             ymin = *(int *)PyArray_GETPTR2(py_array, i, 1);
             width = *(int *)PyArray_GETPTR2(py_array, i, 2) - xmin;
             height = *(int *)PyArray_GETPTR2(py_array, i, 3) - ymin;
-            confidence = 90;
-            obj_type = 1;            
+            confidence = *(int *)PyArray_GETPTR2(py_array, i, 4);
+            obj_type = *(int *)PyArray_GETPTR2(py_array, i, 5);          
             detail_bbxs.push_back(cv::Vec6i(xmin, ymin, width, height, confidence, obj_type));
         }
         break;
@@ -290,8 +290,8 @@ static PyObject *Py_SORT_get_tracks(Py_SORT *self, PyObject *args)
 {
     std::map<int, Track> tracks = self->tracker->GetTracks();
 
-    // convert tracks to numpy array [n, 5]
-    // [id, x, y, w, h]
+    // convert tracks to numpy array [n, 7]
+    // [id, x, y, w, h, confidence, class_id]
 
     // parameters
     // 1. format (int)
@@ -320,7 +320,7 @@ static PyObject *Py_SORT_get_tracks(Py_SORT *self, PyObject *args)
         hited = tracks.size();
 
     int n = hited;
-    int m = 5;
+    int m = 7;
     npy_intp dims[2] = {n, m};
     PyArrayObject *array = (PyArrayObject *)PyArray_SimpleNew(2, dims, NPY_INT32);
     if (array == NULL)
@@ -365,6 +365,9 @@ static PyObject *Py_SORT_get_tracks(Py_SORT *self, PyObject *args)
             PyErr_SetString(PyExc_TypeError, "Invalid format");
             return NULL;
         }
+        // add confidence, class_id
+        *data++ = trk.second.confidence;
+        *data++ = trk.second.obj_type;
         i++;
     }
 
