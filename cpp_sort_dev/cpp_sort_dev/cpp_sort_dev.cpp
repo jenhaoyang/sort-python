@@ -2,6 +2,12 @@
 //
 
 #include "cpp_sort_dev.h"
+#include <Python.h>
+// include numpy object array api
+#include <numpy/arrayobject.h>
+#include <map>
+#include <opencv2/opencv.hpp>
+#include <vector>
 
 using namespace std;
 
