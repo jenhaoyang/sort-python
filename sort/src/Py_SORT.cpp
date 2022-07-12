@@ -167,19 +167,24 @@ static PyObject *Py_SORT_run(Py_SORT *self, PyObject *args)
         py_array = (PyObject *)array_int32;
     }
 
-    // release GIL
-    Py_BEGIN_ALLOW_THREADS
+
 
     // get data
     npy_intp *shape = PyArray_DIMS(array);
     npy_intp n = shape[0];
     npy_intp m = shape[1];
 
-    if (m < 6)
+    // printf("m %d\n", m);
+    // printf("n %d\n", n);
+
+    if (m != 6)
     {
         PyErr_SetString(PyExc_TypeError, "Array must have at least 6 columns");
         return NULL;
     }
+
+    // release GIL
+    Py_BEGIN_ALLOW_THREADS
 
     std::vector <cv::Vec6i> detail_bbxs;
     detail_bbxs.reserve(n);
