@@ -181,10 +181,56 @@ static PyObject *Py_SORT_run(Py_SORT *self, PyObject *args)
         return NULL;
     }
 
+    std::vector <cv::Vec6i> detail_bbxs;
+    detail_bbxs.reserve(n);
+
     std::vector <cv::Rect> rects;
     rects.reserve(n);
 
-    int xmin, ymin, width, height;
+    int xmin, ymin, width, height, confidence, obj_type;
+    switch (format)
+    {
+    case 0:
+        for (int i = 0; i < n; i++)
+        {
+            xmin = *(int *)PyArray_GETPTR2(py_array, i, 0);
+            ymin = *(int *)PyArray_GETPTR2(py_array, i, 1);
+            width = *(int *)PyArray_GETPTR2(py_array, i, 2);
+            height = *(int *)PyArray_GETPTR2(py_array, i, 3);
+            confidence = 90;
+            obj_type = 1;
+            detail_bbxs.push_back(cv::Vec6i(xmin, ymin, width, height, confidence, obj_type));
+        }
+        break;
+    case 1:
+        for (int i = 0; i < n; i++)
+        {
+            width = *(int *)PyArray_GETPTR2(py_array, i, 2);
+            height = *(int *)PyArray_GETPTR2(py_array, i, 3);
+            xmin = *(int *)PyArray_GETPTR2(py_array, i, 0) - width / 2;
+            ymin = *(int *)PyArray_GETPTR2(py_array, i, 1) - height / 2;
+            confidence = 90;
+            obj_type = 1;
+            detail_bbxs.push_back(cv::Vec6i(xmin, ymin, width, height, confidence, obj_type));
+        }
+        break;
+    case 2:
+        for (int i = 0; i < n; i++)
+        {
+            xmin = *(int *)PyArray_GETPTR2(py_array, i, 0);
+            ymin = *(int *)PyArray_GETPTR2(py_array, i, 1);
+            width = *(int *)PyArray_GETPTR2(py_array, i, 2) - xmin;
+            height = *(int *)PyArray_GETPTR2(py_array, i, 3) - ymin;
+            confidence = 90;
+            obj_type = 1;            
+            detail_bbxs.push_back(cv::Vec6i(xmin, ymin, width, height, confidence, obj_type));
+        }
+        break;
+    default:
+        PyErr_SetString(PyExc_TypeError, "Format must be 0, 1 or 2");
+        return NULL;
+    }
+
     switch (format)
     {
     case 0:
