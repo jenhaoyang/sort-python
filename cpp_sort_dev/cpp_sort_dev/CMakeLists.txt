@@ -21,11 +21,12 @@ if (OpenCV_FOUND)
     # be set, you can find the full list with descriptions
     # in the OpenCVConfig.cmake file.
     # Print some message showing some of them
-    include_directories(${OpenCV_INCLUDE_DIRS})
-    link_libraries(${OpenCV_LIBRARIES})
+    # include_directories(${OpenCV_INCLUDE_DIRS})
+    # link_libraries(${OpenCV_LIBRARIES})
     message(STATUS "OpenCV library status:")
     message(STATUS "    version: ${OpenCV_VERSION}")
     message(STATUS "    include path: ${OpenCV_INCLUDE_DIRS}")
+    message(STATUS "    install path: ${OpenCV_INSTALL_PATH}")
 else ()
     message(FATAL_ERROR "Could not locate OpenCV")
 endif()
@@ -44,6 +45,16 @@ endif()
 
 # 將來源新增到此專案的可執行檔。
 add_executable (cpp_sort_dev "cpp_sort_dev.cpp" "cpp_sort_dev.h" "tracker.cpp" "track.cpp" "munkres.cpp" "kalman_filter.cpp" "tracker.h" "track.h" "munkres.h" "kalman_filter.h" "utils.h" )
-
+target_link_libraries(cpp_sort_dev ${OpenCV_LIBS})
 # TODO: 新增測試，並視需要安裝目標。
-install(TARGETS cpp_sort_dev DESTINATION "cpp_sort_dev/bin")
+# install(TARGETS cpp_sort_dev DESTINATION "cpp_sort_dev/bin")
+
+
+message(STATUS "exe folder: ${CMAKE_BINARY_DIR}")
+add_custom_target(SORTBinaries
+  # todo: check if debug and release folder exist
+  # debug version
+  COMMAND ${CMAKE_COMMAND} -E copy ${OpenCV_INSTALL_PATH}/bin/Debug/opencv_world460d.dll          ${CMAKE_BINARY_DIR}/cpp_sort_dev/Debug
+)
+
+add_dependencies(cpp_sort_dev SORTBinaries)
