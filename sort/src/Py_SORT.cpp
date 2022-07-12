@@ -175,17 +175,17 @@ static PyObject *Py_SORT_run(Py_SORT *self, PyObject *args)
     npy_intp n = shape[0];
     npy_intp m = shape[1];
 
-    if (m < 4)
+    if (m < 6)
     {
-        PyErr_SetString(PyExc_TypeError, "Array must have at least 4 columns");
+        PyErr_SetString(PyExc_TypeError, "Array must have at least 6 columns");
         return NULL;
     }
 
     std::vector <cv::Vec6i> detail_bbxs;
     detail_bbxs.reserve(n);
 
-    std::vector <cv::Rect> rects;
-    rects.reserve(n);
+    // std::vector <cv::Rect> rects;
+    // rects.reserve(n);
 
     int xmin, ymin, width, height, confidence, obj_type;
     switch (format)
@@ -231,49 +231,49 @@ static PyObject *Py_SORT_run(Py_SORT *self, PyObject *args)
         return NULL;
     }
 
-    switch (format)
-    {
-    case 0:
-        for (int i = 0; i < n; i++)
-        {
-            xmin = *(int *)PyArray_GETPTR2(py_array, i, 0);
-            ymin = *(int *)PyArray_GETPTR2(py_array, i, 1);
-            width = *(int *)PyArray_GETPTR2(py_array, i, 2);
-            height = *(int *)PyArray_GETPTR2(py_array, i, 3);
-            rects.push_back(cv::Rect(xmin, ymin, width, height));
-        }
-        break;
-    case 1:
-        for (int i = 0; i < n; i++)
-        {
-            width = *(int *)PyArray_GETPTR2(py_array, i, 2);
-            height = *(int *)PyArray_GETPTR2(py_array, i, 3);
-            xmin = *(int *)PyArray_GETPTR2(py_array, i, 0) - width / 2;
-            ymin = *(int *)PyArray_GETPTR2(py_array, i, 1) - height / 2;
-            rects.push_back(cv::Rect(xmin, ymin, width, height));
-        }
-        break;
-    case 2:
-        for (int i = 0; i < n; i++)
-        {
-            xmin = *(int *)PyArray_GETPTR2(py_array, i, 0);
-            ymin = *(int *)PyArray_GETPTR2(py_array, i, 1);
-            width = *(int *)PyArray_GETPTR2(py_array, i, 2) - xmin;
-            height = *(int *)PyArray_GETPTR2(py_array, i, 3) - ymin;
-            rects.push_back(cv::Rect(xmin, ymin, width, height));
-        }
-        break;
-    default:
-        PyErr_SetString(PyExc_TypeError, "Format must be 0, 1 or 2");
-        return NULL;
-    }
+    // switch (format)
+    // {
+    // case 0:
+    //     for (int i = 0; i < n; i++)
+    //     {
+    //         xmin = *(int *)PyArray_GETPTR2(py_array, i, 0);
+    //         ymin = *(int *)PyArray_GETPTR2(py_array, i, 1);
+    //         width = *(int *)PyArray_GETPTR2(py_array, i, 2);
+    //         height = *(int *)PyArray_GETPTR2(py_array, i, 3);
+    //         rects.push_back(cv::Rect(xmin, ymin, width, height));
+    //     }
+    //     break;
+    // case 1:
+    //     for (int i = 0; i < n; i++)
+    //     {
+    //         width = *(int *)PyArray_GETPTR2(py_array, i, 2);
+    //         height = *(int *)PyArray_GETPTR2(py_array, i, 3);
+    //         xmin = *(int *)PyArray_GETPTR2(py_array, i, 0) - width / 2;
+    //         ymin = *(int *)PyArray_GETPTR2(py_array, i, 1) - height / 2;
+    //         rects.push_back(cv::Rect(xmin, ymin, width, height));
+    //     }
+    //     break;
+    // case 2:
+    //     for (int i = 0; i < n; i++)
+    //     {
+    //         xmin = *(int *)PyArray_GETPTR2(py_array, i, 0);
+    //         ymin = *(int *)PyArray_GETPTR2(py_array, i, 1);
+    //         width = *(int *)PyArray_GETPTR2(py_array, i, 2) - xmin;
+    //         height = *(int *)PyArray_GETPTR2(py_array, i, 3) - ymin;
+    //         rects.push_back(cv::Rect(xmin, ymin, width, height));
+    //     }
+    //     break;
+    // default:
+    //     PyErr_SetString(PyExc_TypeError, "Format must be 0, 1 or 2");
+    //     return NULL;
+    // }
 
     // for (int i = 0; i < n; i++)
     // {
     //     printf("%d: [%d, %d, %d, %d]\n", i, rects[i].x, rects[i].y, rects[i].width, rects[i].height);
     // }
     // run tracker
-    self->tracker->Run(rects);
+    self->tracker->Run(detail_bbxs);
 
     // acquire GIL
     Py_END_ALLOW_THREADS

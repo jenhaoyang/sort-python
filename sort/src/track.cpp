@@ -80,9 +80,20 @@ void Track::Update(const cv::Rect& bbox) {
 
 }
 
+cv::Rect convert_single_rect(const cv::Vec6i& detail_detections) {
+    int n = 4;
+    cv::Rect detection = cv::Rect(detail_detections[0],
+        detail_detections[1],
+        detail_detections[2],
+        detail_detections[3]);
+    return detection;
+}
 
 // Create and initialize new trackers for unmatched detections, with initial bounding box
-void Track::Init(const cv::Rect &bbox) {
+void Track::Init(const cv::Vec6i &detail_bbox) {
+    confidence = detail_bbox[4];
+    obj_type = detail_bbox[5];
+    cv::Rect bbox = convert_single_rect(detail_bbox);
     kf_.x_.head(4) << ConvertBboxToObservation(bbox);
     hit_streak_++;
 }
@@ -137,3 +148,4 @@ cv::Rect Track::ConvertStateToBbox(const Eigen::VectorXd &state) const {
     cv::Rect rect(cv::Point(tl_x, tl_y), cv::Size(width, height));
     return rect;
 }
+

@@ -11,7 +11,7 @@ public:
     // Destructor
     ~Track() = default;
 
-    void Init(const cv::Rect& bbox);
+    void Init(const cv::Vec6i& bbox);
     void Predict();
     void Update(const cv::Rect& bbox);
     cv::Rect GetStateAsBbox() const;
@@ -24,4 +24,8 @@ private:
     cv::Rect ConvertStateToBbox(const Eigen::VectorXd &state) const;
 
     KalmanFilter kf_;
+    int confidence = -1;
+    int obj_type = -1;
 };
+
+cv::Rect convert_single_rect(const cv::Vec6i& detail_detections);

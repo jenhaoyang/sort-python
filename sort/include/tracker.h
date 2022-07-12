@@ -28,13 +28,13 @@ public:
  * @param unmatched_det
  * @param iou_threshold
  */
-    static void AssociateDetectionsToTrackers(const std::vector<cv::Rect>& detection,
+    static void AssociateDetectionsToTrackers(const std::vector<cv::Vec6i>& detection,
                                        std::map<int, Track>& tracks,
                                        std::map<int, cv::Rect>& matched,
-                                       std::vector<cv::Rect>& unmatched_det,
+                                       std::vector<cv::Vec6i>& unmatched_det,
                                        float iou_threshold = 0.3);
 
-    void Run(const std::vector<cv::Rect>& detections);
+    void Run(const std::vector<cv::Vec6i>& detail_bbxs);
 
     std::map<int, Track> GetTracks();
 
@@ -49,3 +49,5 @@ private:
     int max_age_;
     float iou_threshold_;
 };
+
+std::vector<cv::Rect> convert_rect(const std::vector<cv::Vec6i>& detail_detections);

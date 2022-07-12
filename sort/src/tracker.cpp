@@ -81,15 +81,17 @@ void Tracker::HungarianMatching(const std::vector<std::vector<float>>& iou_matri
     }
 }
 
-void Tracker::AssociateDetectionsToTrackers(const std::vector<cv::Rect>& detection,
+void Tracker::AssociateDetectionsToTrackers(const std::vector<cv::Vec6i>& detail_bbxs,
                                             std::map<int, Track>& tracks,
                                             std::map<int, cv::Rect>& matched,
-                                            std::vector<cv::Rect>& unmatched_det,
+                                            std::vector<cv::Vec6i>& unmatched_det,
                                             float iou_threshold) {
-
+    
+    std::vector <cv::Rect> detection = convert_rect(detail_bbxs);
+    
     // Set all detection as unmatched if no tracks existing
     if (tracks.empty()) {
-        for (const auto& det : detection) {
+        for (const auto& det : detail_bbxs) {
             unmatched_det.push_back(det);
         }
         return;
@@ -97,15 +99,15 @@ void Tracker::AssociateDetectionsToTrackers(const std::vector<cv::Rect>& detecti
 
     std::vector<std::vector<float>> iou_matrix;
     // resize IOU matrix based on number of detection and tracks
-    iou_matrix.resize(detection.size(), std::vector<float>(tracks.size()));
+    iou_matrix.resize(detail_bbxs.size(), std::vector<float>(tracks.size()));
 
     std::vector<std::vector<float>> association;
     // resize association matrix based on number of detection and tracks
-    association.resize(detection.size(), std::vector<float>(tracks.size()));
+    association.resize(detail_bbxs.size(), std::vector<float>(tracks.size()));
 
 
     // row - detection, column - tracks
-    for (size_t i = 0; i < detection.size(); i++) {
+    for (size_t i = 0; i < detail_bbxs.size(); i++) {
         size_t j = 0;
         for (const auto& trk : tracks) {
             iou_matrix[i][j] = CalculateIou(detection[i], trk.second);
@@ -114,9 +116,9 @@ void Tracker::AssociateDetectionsToTrackers(const std::vector<cv::Rect>& detecti
     }
 
     // Find association
-    HungarianMatching(iou_matrix, detection.size(), tracks.size(), association);
+    HungarianMatching(iou_matrix, detail_bbxs.size(), tracks.size(), association);
 
-    for (size_t i = 0; i < detection.size(); i++) {
+    for (size_t i = 0; i < detail_bbxs.size(); i++) {
         bool matched_flag = false;
         size_t j = 0;
         for (const auto& trk : tracks) {
@@ -133,14 +135,15 @@ void Tracker::AssociateDetectionsToTrackers(const std::vector<cv::Rect>& detecti
         }
         // if detection cannot match with any tracks
         if (!matched_flag) {
-            unmatched_det.push_back(detection[i]);
+            unmatched_det.push_back(detail_bbxs[i]);
         }
     }
 }
 
 
-void Tracker::Run(const std::vector<cv::Rect>& detections) {
+void Tracker::Run(const std::vector<cv::Vec6i>& detail_bbxs) {
 
+    std::vector <cv::Rect> detections = convert_rect(detail_bbxs);
     /*** Predict internal tracks from previous frame ***/
     for (auto &track : tracks_) {
         track.second.Predict();
@@ -149,12 +152,14 @@ void Tracker::Run(const std::vector<cv::Rect>& detections) {
     // Hash-map between track ID and associated detection bounding box
     std::map<int, cv::Rect> matched;
     // vector of unassociated detections
-    std::vector<cv::Rect> unmatched_det;
+    std::vector<cv::Vec6i> unmatched_det;
 
     // return values - matched, unmatched_det
-    if (!detections.empty()) {
-        AssociateDetectionsToTrackers(detections, tracks_, matched, unmatched_det, iou_threshold_);
+    if (!detail_bbxs.empty()) {
+        AssociateDetectionsToTrackers(detail_bbxs, tracks_, matched, unmatched_det, iou_threshold_);
     }
+
+    
 
     /*** Update tracks with associated bbox ***/
     for (const auto &match : matched) {
@@ -187,4 +192,18 @@ std::map<int, Track> Tracker::GetTracks() {
 
 void Tracker::ResetID() {
     id_ = 0;
+}
+
+
+std::vector<cv::Rect> convert_rect(const std::vector<cv::Vec6i>& detail_detections) {
+    int n = 4;
+    std::vector <cv::Rect> detection;
+    detection.reserve(n);
+
+    for (auto it = detail_detections.begin(); it != detail_detections.end(); ++it) {
+        detection.push_back(cv::Rect((*it)[0], (*it)[1], (*it)[2], (*it)[3]));
+        //std::cout << "a";
+    }
+
+    return detection;
 }
