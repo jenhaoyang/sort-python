@@ -2,7 +2,7 @@
 //
 
 #include "cpp_sort_dev.h"
-#include <Python.h>
+#include "tracker.h"
 // include numpy object array api
 #include <numpy/arrayobject.h>
 #include <map>
@@ -14,5 +14,7 @@ using namespace std;
 int main()
 {
 	cout << "Hello CMake." << endl;
+	Tracker* tracker = new Tracker(3, 0.3);
+
 	return 0;
 }

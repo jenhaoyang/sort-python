@@ -30,8 +30,20 @@ else ()
     message(FATAL_ERROR "Could not locate OpenCV")
 endif()
 
+find_package(Eigen3 REQUIRED)
+if(Eigen3_FOUND)
+    get_target_property(EIGEN3_INCLUDE_DIR Eigen3::Eigen INTERFACE_INCLUDE_DIRECTORIES)
+    #include( ${EIGEN3_USE_FILE} ) #This line not work on windows
+    include_directories( ${EIGEN3_INCLUDE_DIR})
+    message(STATUS "Eigen3 library status:")
+    message(STATUS "    version: ${Eigen3_VERSION}")
+    message(STATUS "    include path: ${EIGEN3_INCLUDE_DIR}")
+else ()
+    message(FATAL_ERROR "Could not locate Eigen3")
+endif()
+
 # 將來源新增到此專案的可執行檔。
-add_executable (cpp_sort_dev "cpp_sort_dev.cpp" "cpp_sort_dev.h")
+add_executable (cpp_sort_dev "cpp_sort_dev.cpp" "cpp_sort_dev.h" "tracker.cpp" "track.cpp" "munkres.cpp" "kalman_filter.cpp" "tracker.h" "track.h" "munkres.h" "kalman_filter.h" "utils.h" )
 
 # TODO: 新增測試，並視需要安裝目標。
 install(TARGETS cpp_sort_dev DESTINATION "cpp_sort_dev/bin")
