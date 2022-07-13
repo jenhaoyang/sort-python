@@ -68,10 +68,10 @@ defaulf format is 0.
 
 ```python
 # Input:
-#   bounding_boxes: a numpy array of bounding boxes [n, 4]
+#   bounding_boxes: a numpy array of bounding boxes with its confidence and class id [n, 6]
 #   format: format of bounding boxes (int)
 import numpy as np
-bounding_boxes = np.array([[10, 10, 20, 20], [30, 30, 40, 40]])
+bounding_boxes = np.array([[10, 10, 20, 20, 90, 1], [30, 30, 40, 40, 70, 2]])
 tracker.run(bounding_boxes, 0)
 ```
 
@@ -83,8 +83,8 @@ tracker.run(bounding_boxes, 0)
 # Input:
 #   format: format of bounding boxes (int)
 # Output:
-#   tracks: a numpy array of tracks [n, 5] where n is the number of tracks
-#       and 5 is (id, ..., ..., ..., ...) where id is the track id and ... is the bounding box in the specified format
+#   tracks: a numpy array of tracks [n, 7] where n is the number of tracks
+#       and 7 is (id, ..., ..., ..., ..., confidence, class_id) where id is the track id and ... is the bounding box in the specified format
 tracks = tracker.get_tracks(0)
 ```
 
